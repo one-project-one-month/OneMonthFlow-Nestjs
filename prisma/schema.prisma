@@ -1,0 +1,105 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TBL_MEMBER {
+  MEMBER_ID            Int      @id @default(autoincrement())
+  MEMBER_CODE          String   @unique
+  MEMBER_NAME          String
+  GITHUB_ACCOUNT_NAME  String?
+  NRC                  String?
+  MOBILE_NO            String?
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_TECHSTACK {
+  TECHSTACK_ID         Int      @id @default(autoincrement())
+  TECHSTACK_CODE       String   @unique
+  TECHSTACK_SHORT_CODE String?
+  TECHSTACK_NAME       String
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_MEMBERTECHSTACK {
+  MEMBER_TECHSTACK_ID  Int      @id @default(autoincrement())
+  MEMBER_CODE          String
+  TECHSTACK_CODE       String
+  PROFICIENCY_LEVEL    Int?
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_TEAM {
+  TEAM_ID              Int      @id @default(autoincrement())
+  TEAM_CODE            String   @unique
+  TEAM_NAME            String
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_PROJECT {
+  PROJECT_ID           Int      @id @default(autoincrement())
+  PROJECT_CODE         String   @unique
+  PROJECT_NAME         String
+  REPO_URL             String?
+  START_DATE           DateTime?
+  END_DATE             DateTime?
+  PROJECT_DESCRIPTION  String?
+  PROJECT_STATUS       String?
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_PROJECTTEAM {
+  PROJECT_TEAM_ID      Int      @id @default(autoincrement())
+  PROJECT_CODE         String
+  TEAM_CODE            String
+  PROJECT_TEAM_RANKING Float?
+  DURATION             Int?
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_TEAMMEMBER {
+  TEAM_MEMBER_ID       Int      @id @default(autoincrement())
+  TEAM_CODE            String
+  MEMBER_CODE          String
+  MEMBER_RATING        Float?
+  CREATED_DATE         DateTime @default(now())
+  CREATED_BY           String?
+  UPDATED_DATE         DateTime @default(now()) @updatedAt
+  DEL_FLAG             Int      @default(0)
+}
+
+model TBL_PROJECTTEAMACTIVITY {
+  PROJECT_TEAM_ACTIVITY_ID Int   @id @default(autoincrement())
+  MEMBER_CODE              String
+  TEAM_CODE                String
+  PROJECT_CODE             String
+  TECHSTACK_CODE           String
+  ACTIVITY_DATE            DateTime?
+  TASKS                    String?
+  CREATED_DATE             DateTime @default(now())
+  CREATED_BY               String?
+  UPDATED_DATE             DateTime @default(now()) @updatedAt
+  DEL_FLAG                 Int      @default(0)
+}
