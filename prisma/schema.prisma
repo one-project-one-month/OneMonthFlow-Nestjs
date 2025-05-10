@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  // output   = "prisma"
 }
 
 model TBL_MEMBER {
@@ -44,7 +45,7 @@ model TBL_MEMBERTECHSTACK {
 
 model TBL_TEAM {
   TEAM_ID              Int      @id @default(autoincrement())
-  TEAM_CODE            String   @unique
+  TEAM_CODE            String   @unique @default(uuid())
   TEAM_NAME            String
   CREATED_DATE         DateTime @default(now())
   CREATED_BY           String?
@@ -54,7 +55,7 @@ model TBL_TEAM {
 
 model TBL_PROJECT {
   PROJECT_ID           Int      @id @default(autoincrement())
-  PROJECT_CODE         String   @unique
+  PROJECT_CODE         String   @unique @default(uuid())
   PROJECT_NAME         String
   REPO_URL             String?
   START_DATE           DateTime?
