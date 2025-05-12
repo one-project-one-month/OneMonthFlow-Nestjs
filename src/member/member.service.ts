@@ -8,13 +8,11 @@ export class MemberService {
 
   async registerMember(req: RegisterMemberDto) {
     const { memberName, githubAccountName, nrc, mobileNo, teamCode, projectCode } = req;
-    const { v4: uuidv4 } = await import('uuid');
-    const MEMBER_CODE = uuidv4();
     try {
       // 1. Create the member
       const member = await this.prisma.tBL_MEMBER.create({
         data: {
-          MEMBER_CODE,
+          MEMBER_CODE: crypto.randomUUID(),
           MEMBER_NAME: memberName,
           GITHUB_ACCOUNT_NAME: githubAccountName,
           NRC: nrc,
@@ -27,7 +25,7 @@ export class MemberService {
         await this.prisma.tBL_TEAMMEMBER.create({
           data: {
             TEAM_CODE: teamCode,
-            MEMBER_CODE: MEMBER_CODE,
+            MEMBER_CODE: member.MEMBER_CODE,
           },
         });
       }

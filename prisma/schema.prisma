@@ -10,7 +10,7 @@ generator client {
 
 model TBL_MEMBER {
   MEMBER_ID            Int      @id @default(autoincrement())
-  MEMBER_CODE          String   @unique
+  MEMBER_CODE          String   @unique @default(uuid())
   MEMBER_NAME          String
   GITHUB_ACCOUNT_NAME  String?
   NRC                  String?
