@@ -175,7 +175,72 @@ CREATE TABLE `TBL_PROJECTTEAMACTIVITY` (
 );
 
 ```
+``` Tbl_Team
 
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ('Backend Team', 'admin');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'Frontend Team', 'admin');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'DevOps Team', 'john.doe');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'QA Team', 'qa.manager');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'Mobile Team', 'admin');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'Data Science Team', 'jane.smith');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'Security Team', 'security.lead');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'Design Team', 'designer.1');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'AI Research Team', 'ai.lead');
+
+INSERT INTO TBL_TEAM ( TEAM_NAME, CREATED_BY)
+VALUES ( 'Support Team', 'support.admin');
+
+```
+
+```Tbl_Project
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Inventory Management System', 'https://github.com/example/inventory', '2023-01-01 09:00:00.000', '2023-06-01 17:00:00.000', 'A system to manage inventory for retail stores.', 'Completed', 'john.doe');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Customer Portal', 'https://github.com/example/customer-portal', '2023-03-15 10:00:00.000', NULL, 'Portal for customers to manage their profiles.', 'Active', 'admin');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('HR System', 'https://github.com/example/hr-system', '2022-11-10 08:30:00.000', '2023-02-28 16:00:00.000', 'Handles recruitment and payroll.', 'Completed', 'hr.manager');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('E-commerce Platform', 'https://github.com/example/ecommerce', '2023-07-01 09:00:00.000', NULL, 'Multi-vendor online marketplace.', 'In Progress', 'project.lead');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Chat Application', 'https://github.com/example/chat-app', '2023-05-05 11:00:00.000', NULL, 'Real-time messaging with WebSocket.', 'Active', 'dev.team');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Analytics Dashboard', 'https://github.com/example/analytics-dashboard', '2022-09-01 09:00:00.000', '2022-12-20 15:00:00.000', 'Interactive dashboard for business metrics.', 'Completed', 'jane.smith');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Booking System', 'https://github.com/example/booking-system', '2023-02-01 10:30:00.000', NULL, 'System to book appointments or services.', 'Active', 'booking.admin');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Document Management System', 'https://github.com/example/dms', '2022-08-10 08:00:00.000', '2023-01-15 17:30:00.000', 'Organizes and stores digital documents.', 'Completed', 'admin');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('Online Learning Platform', 'https://github.com/example/learning-platform', '2023-04-20 10:00:00.000', NULL, 'Educational platform for online courses.', 'In Progress', 'education.lead');
+
+INSERT INTO TBL_PROJECT (PROJECT_NAME, REPO_URL, START_DATE, END_DATE, PROJECT_DESCRIPTION, PROJECT_STATUS, CREATED_BY)
+VALUES ('API Gateway Service', 'https://github.com/example/api-gateway', '2023-06-01 09:00:00.000', NULL, 'Handles routing and authentication for microservices.', 'Active', 'infra.admin');
+,,,
 
 
   

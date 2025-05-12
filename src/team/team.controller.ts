@@ -1,10 +1,10 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { AddMemberToTeamDto } from './team.dto';
+import { AddMemberToTeamDto, AddTeamToProjectDto } from './dto/team.dto';
 import { TeamService } from './team.service';
 
 @Controller('team')
 export class TeamController {
-  constructor(private readonly teamService: TeamService) {}
+  constructor(private readonly teamService: TeamService) { }
   @Post('/add-member')
   async addMemberToTeam(@Body() addMemberToTeamDto: AddMemberToTeamDto) {
     try {
@@ -15,8 +15,13 @@ export class TeamController {
     }
   }
 
-    @Post("/add-project")
-    addProject() {
-      return { message: 'This is add team into project route.' };
+  @Post('/add-project')
+  async addTeamToProject(@Body() addTeamToProjectDto: AddTeamToProjectDto) {
+    try {
+      const result = await this.teamService.addTeamToProject(addTeamToProjectDto);
+      return result;
+    } catch (error) {
+      return { success: false, message: error.message };
     }
+  }
 }
