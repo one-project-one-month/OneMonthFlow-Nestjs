@@ -1,24 +1,24 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class AddMemberToTeamDto {
-  @IsUUID()
   @IsNotEmpty()
+  @IsString()
   memberCode: string;
 
-  @IsUUID()
   @IsNotEmpty()
+  @IsString()
   teamCode: string;
 
-  @IsUUID()
+  @IsString()
   projectCode: string;
 }
 
 export class AddTeamToProjectDto {
-  @IsUUID()
   @IsNotEmpty()
+  @IsString()
   teamCode: string;
 
-  @IsUUID()
   @IsNotEmpty()
+  @IsString()
   projectCode: string;
 }
