@@ -1,29 +1,165 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddMemberToTeamDto, AddTeamToProjectDto } from './dto/team.dto';
+import { 
+  AddMemberToTeamDto, 
+  AddTeamToProjectDto, 
+  CreateTeamDto, 
+  UpdateTeamDto, 
+  TeamResponseDto 
+} from './dto/team.dto';
 
 @Injectable()
 export class TeamService {
   constructor(private prisma: PrismaService) { }
 
+  private mapToTeamResponse(team: any): TeamResponseDto {
+    return {
+      teamId: team.TEAM_ID,
+      teamCode: team.TEAM_CODE,
+      teamName: team.TEAM_NAME,
+      createdDate: team.CREATED_DATE,
+      updatedDate: team.UPDATED_DATE
+    };
+  }
+
+  async createTeam(createTeamDto: CreateTeamDto): Promise<TeamResponseDto> {
+    const team = await this.prisma.tBL_TEAM.create({
+      data: {
+        TEAM_CODE: crypto.randomUUID(),
+        TEAM_NAME: createTeamDto.teamName,
+      },
+    });
+    return this.mapToTeamResponse(team);
+  }
+
+  async findAllTeams(): Promise<TeamResponseDto[]> {
+    const teams = await this.prisma.tBL_TEAM.findMany({
+      where: {
+        DEL_FLAG: 0
+      },
+      orderBy: {
+        CREATED_DATE: 'desc'
+      }
+    });
+    return teams.map(team => this.mapToTeamResponse(team));
+  }
+
+  async findTeamByCode(teamCode: string): Promise<TeamResponseDto> {
+    const team = await this.prisma.tBL_TEAM.findUnique({
+      where: { 
+        TEAM_CODE: teamCode,
+        DEL_FLAG: 0 
+      }
+    });
+
+    if (!team) {
+      throw new NotFoundException(`Team with code ${teamCode} not found`);
+    }
+
+    return this.mapToTeamResponse(team);
+  }
+
+  async updateTeam(teamCode: string, updateTeamDto: UpdateTeamDto): Promise<TeamResponseDto> {
+    const existingTeam = await this.prisma.tBL_TEAM.findUnique({
+      where: { 
+        TEAM_CODE: teamCode,
+        DEL_FLAG: 0 
+      }
+    });
+
+    if (!existingTeam) {
+      throw new NotFoundException(`Team with code ${teamCode} not found`);
+    }
+
+    const updatedTeam = await this.prisma.tBL_TEAM.update({
+      where: { TEAM_CODE: teamCode },
+      data: {
+        TEAM_NAME: updateTeamDto.teamName,
+      },
+    });
+
+    return this.mapToTeamResponse(updatedTeam);
+  }
+
+
+  async removeTeam(teamCode: string): Promise<{ success: boolean }> {
+    const existingTeam = await this.prisma.tBL_TEAM.findUnique({
+      where: { 
+        TEAM_CODE: teamCode,
+        DEL_FLAG: 0 
+      }
+    });
+
+    if (!existingTeam) {
+      throw new NotFoundException(`Team with code ${teamCode} not found`);
+    }
+
+
+    await this.prisma.tBL_TEAM.update({
+      where: { TEAM_CODE: teamCode },
+      data: { DEL_FLAG: 1 },
+    });
+
+    return { success: true };
+  }
+
   async addMemberToTeam(req: AddMemberToTeamDto) {
     const { memberCode, teamCode, projectCode } = req;
     try {
-      // 1. Add member to team
+      // Check if team exists
+      const team = await this.prisma.tBL_TEAM.findUnique({
+        where: { 
+          TEAM_CODE: teamCode,
+          DEL_FLAG: 0 
+        }
+      });
+
+      if (!team) {
+        throw new NotFoundException(`Team with code ${teamCode} not found`);
+      }
+
+      // Check if member exists
+      const member = await this.prisma.tBL_MEMBER.findUnique({
+        where: { 
+          MEMBER_CODE: memberCode,
+          DEL_FLAG: 0 
+        }
+      });
+
+      if (!member) {
+        throw new NotFoundException(`Member with code ${memberCode} not found`);
+      }
+
+      // Add member to team
       await this.prisma.tBL_TEAMMEMBER.create({
         data: {
           TEAM_CODE: teamCode,
           MEMBER_CODE: memberCode,
         },
       });
-      // 2. Ensure project-team relationship exists
+
+      // Ensure project-team relationship exists if projectCode is provided
       if (projectCode) {
+        const project = await this.prisma.tBL_PROJECT.findUnique({
+          where: { 
+            PROJECT_CODE: projectCode,
+            DEL_FLAG: 0 
+          }
+        });
+
+        if (!project) {
+          throw new NotFoundException(`Project with code ${projectCode} not found`);
+        }
+
+
         const projectTeam = await this.prisma.tBL_PROJECTTEAM.findFirst({
           where: {
             PROJECT_CODE: projectCode,
             TEAM_CODE: teamCode,
+            DEL_FLAG: 0
           },
         });
+
         if (!projectTeam) {
           await this.prisma.tBL_PROJECTTEAM.create({
             data: {
@@ -33,6 +169,7 @@ export class TeamService {
           });
         }
       }
+
       return { success: true };
     } catch (error) {
       throw new Error(`Failed to add member to team: ${error.message}`);
