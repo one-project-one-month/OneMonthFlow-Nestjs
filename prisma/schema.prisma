@@ -23,7 +23,7 @@ model TBL_MEMBER {
 
 model TBL_TECHSTACK {
   TECHSTACK_ID         Int      @id @default(autoincrement())
-  TECHSTACK_CODE       String   @unique
+  TECHSTACK_CODE       String   @unique @default(uuid())
   TECHSTACK_SHORT_CODE String?
   TECHSTACK_NAME       String
   CREATED_DATE         DateTime @default(now())
