@@ -9,6 +9,9 @@ import { MemberService } from './member/member.service';
 import { MemberModule } from './member/member.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TeamService } from './team/team.service';
+import { ProjectService } from './project/project.service';
+import { TechstackController } from './techstack/techstack.controller';
+import { TechstackService } from './techstack/techstack.service';
 
 @Module({
   imports: [
@@ -17,9 +20,9 @@ import { TeamService } from './team/team.service';
       isGlobal: true,
     }),
     MemberModule,
-    PrismaModule,
+    PrismaModule  ],
+  controllers: [AppController, MemberController, TeamController, ProjectController,TechstackController
   ],
-  controllers: [AppController, MemberController, TeamController, ProjectController],
-  providers: [AppService, MemberService,TeamService],
+  providers: [AppService, MemberService,TeamService,ProjectService,TechstackService],
 })
 export class AppModule {}
