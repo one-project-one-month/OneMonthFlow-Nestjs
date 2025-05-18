@@ -1,20 +1,21 @@
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  Get, 
-  Param, 
-  Put, 
-  Delete, 
-  Query 
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  Query,
 } from '@nestjs/common';
-import { 
-  CreateProjectDto, 
-  UpdateProjectDto, 
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
   ProjectResponseDto,
-  ProjectStatus
+  ProjectStatus,
 } from './dto/project.dto';
 import { ProjectService } from './project.service';
+import { ResultService } from 'src/result/result.service';
 
 @Controller('projects')
 export class ProjectController {
@@ -22,20 +23,20 @@ export class ProjectController {
 
   @Post()
   async create(
-    @Body() createProjectDto: CreateProjectDto
-  ): Promise<ProjectResponseDto> {
+    @Body() createProjectDto: CreateProjectDto,
+  ): Promise<ResultService<ProjectResponseDto>> {
     return this.projectService.createProject(createProjectDto);
   }
 
   @Get()
-  async findAll(): Promise<ProjectResponseDto[]> {
+  async findAll(): Promise<ResultService<ProjectResponseDto[]>> {
     return this.projectService.findAllProjects();
   }
 
   @Get(':code')
   async findOne(
-    @Param('code') code: string
-  ): Promise<ProjectResponseDto> {
+    @Param('code') code: string,
+  ): Promise<ResultService<ProjectResponseDto>> {
     return this.projectService.findProjectByCode(code);
   }
 
@@ -43,14 +44,14 @@ export class ProjectController {
   async update(
     @Param('code') code: string,
     @Body() updateProjectDto: UpdateProjectDto,
-  ): Promise<ProjectResponseDto> {
+  ): Promise<ResultService<ProjectResponseDto>> {
     return this.projectService.updateProject(code, updateProjectDto);
   }
 
   @Delete(':code')
   async remove(
-    @Param('code') code: string
-  ): Promise<{ success: boolean }> {
+    @Param('code') code: string,
+  ): Promise<ResultService<{ success: boolean }>> {
     return this.projectService.removeProject(code);
   }
 }

@@ -1,11 +1,27 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createMemberTechStackDto, RegisterMemberDto, updateMemberTechStackDto } from './dto';
+import {
+  createMemberTechStackDto,
+  RegisterMemberDto,
+  updateMemberTechStackDto,
+} from './dto';
 import { ResultService } from 'src/result/result.service';
 
 @Injectable()
 export class MemberService {
   constructor(private prisma: PrismaService) {}
+
+  private mapToMemberResponse(member: any): RegisterMemberDto {
+    return {
+      memberName: member.MEMBER_NAME,
+      githubAccountName: member.GITHUB_ACCOUNT_NAME,
+      mobileNo: member.MOBILE_NO,
+      nrc: member.NRC,
+      projectCode: member.PROJECT_CODE,
+      team: member.TEAM,
+      techStacks: member.TECHSTACK,
+    };
+  }
 
   async registerMember(req: RegisterMemberDto) {
     const {
@@ -20,8 +36,12 @@ export class MemberService {
 
     // Validate required fields
     if (!memberName || !githubAccountName || !mobileNo) {
-      throw new BadRequestException(
+      // throw new BadRequestException(
+      //   'Member name, GitHub account name, and mobile number are required',
+      // );
+      return ResultService.NotFoundError(
         'Member name, GitHub account name, and mobile number are required',
+        404,
       );
     }
 
@@ -85,24 +105,26 @@ export class MemberService {
       }
 
       // return { success: true, member };
-      return ResultService.Success(member)
+      return ResultService.Success(member);
     } catch (error) {
       throw new Error(`Failed to register member: ${error.message}`);
     }
   }
 
   async createMemberTechStack(req: createMemberTechStackDto) {
-    const {memberCode, techStacks } = req;
+    const { memberCode, techStacks } = req;
 
     if (!techStacks || techStacks.length === 0) {
-      throw new BadRequestException('TechStacks array is required and must not be empty');
+      throw new BadRequestException(
+        'TechStacks array is required and must not be empty',
+      );
     }
 
     try {
       // Create all member-techstack relationships in a single transaction
 
       const createdTechStacks = await this.prisma.$transaction(
-        techStacks.map(item =>
+        techStacks.map((item) =>
           this.prisma.tBL_MEMBERTECHSTACK.create({
             data: {
               MEMBER_CODE: memberCode,
@@ -114,9 +136,11 @@ export class MemberService {
       );
 
       // return { success: true, createdTechStacks };
-      return ResultService.Success(createdTechStacks)
+      return ResultService.Success(createdTechStacks);
     } catch (error) {
-      throw new BadRequestException(`Failed to create member techstack: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to create member techstack: ${error.message}`,
+      );
     }
   }
 
@@ -124,7 +148,9 @@ export class MemberService {
     const { memberCode, techStacks } = req;
 
     if (!techStacks || techStacks.length === 0) {
-      throw new BadRequestException('TechStacks array is required and must not be empty');
+      throw new BadRequestException(
+        'TechStacks array is required and must not be empty',
+      );
     }
 
     try {
@@ -137,7 +163,7 @@ export class MemberService {
 
       // Then create new techstack relationships
       const updatedTechStacks = await this.prisma.$transaction(
-        techStacks.map(item =>
+        techStacks.map((item) =>
           this.prisma.tBL_MEMBERTECHSTACK.create({
             data: {
               MEMBER_CODE: memberCode,
@@ -149,9 +175,11 @@ export class MemberService {
       );
 
       // return { success: true, updatedTechStacks };
-      return ResultService.Success(updatedTechStacks)
+      return ResultService.Success(updatedTechStacks);
     } catch (error) {
-      throw new BadRequestException(`Failed to update member techstack: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to update member techstack: ${error.message}`,
+      );
     }
   }
 }

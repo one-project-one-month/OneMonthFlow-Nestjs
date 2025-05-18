@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   AddMemberToTeamDto,
@@ -23,7 +23,9 @@ export class TeamService {
     };
   }
 
-  async createTeam(createTeamDto: CreateTeamDto) {
+  async createTeam(
+    createTeamDto: CreateTeamDto,
+  ): Promise<ResultService<TeamResponseDto>> {
     try {
       const team = await this.prisma.tBL_TEAM.create({
         data: {
@@ -31,14 +33,15 @@ export class TeamService {
           TEAM_NAME: createTeamDto.teamName,
         },
       });
+      const model = this.mapToTeamResponse(team);
       // return this.mapToTeamResponse(team);
-      return ResultService.Success(team);
+      return ResultService.Success(model);
     } catch (error) {
       return ResultService.SystemError(error.message, 500);
     }
   }
 
-  async findAllTeams() {
+  async findAllTeams(): Promise<ResultService<TeamResponseDto[]>> {
     const teams = await this.prisma.tBL_TEAM.findMany({
       where: {
         DEL_FLAG: 0,
@@ -48,10 +51,13 @@ export class TeamService {
       },
     });
     // return teams.map(team => this.mapToTeamResponse(team));
-    return ResultService.Success(teams);
+    const model = teams.map((team) => this.mapToTeamResponse(team));
+    return ResultService.Success(model);
   }
 
-  async findTeamByCode(teamCode: string) {
+  async findTeamByCode(
+    teamCode: string,
+  ): Promise<ResultService<TeamResponseDto>> {
     try {
       const team = await this.prisma.tBL_TEAM.findUnique({
         where: {
@@ -61,16 +67,23 @@ export class TeamService {
       });
 
       if (!team) {
-        throw new NotFoundException(`Team with code ${teamCode} not found`);
+        // throw new NotFoundException(`Team with code ${teamCode} not found`);
+        return ResultService.NotFoundError(
+          `Team with code ${teamCode} not found`,
+          404,
+        );
       }
-
-      return ResultService.Success(team);
+      const model = this.mapToTeamResponse(team);
+      return ResultService.Success(model);
     } catch (error) {
-      return ResultService.SystemError(error.message,  500);
+      return ResultService.SystemError(error.message, 500);
     }
   }
 
-  async updateTeam(teamCode: string, updateTeamDto: UpdateTeamDto) {
+  async updateTeam(
+    teamCode: string,
+    updateTeamDto: UpdateTeamDto,
+  ): Promise<ResultService<TeamResponseDto>> {
     try {
       const existingTeam = await this.prisma.tBL_TEAM.findUnique({
         where: {
@@ -80,7 +93,11 @@ export class TeamService {
       });
 
       if (!existingTeam) {
-        throw new NotFoundException(`Team with code ${teamCode} not found`);
+        // throw new NotFoundException(`Team with code ${teamCode} not found`);
+        return ResultService.ValidationError(
+          `Team with code ${teamCode} not found`,
+          403,
+        );
       }
 
       const updatedTeam = await this.prisma.tBL_TEAM.update({
@@ -91,13 +108,16 @@ export class TeamService {
       });
 
       // return this.mapToTeamResponse(updatedTeam);
-      return ResultService.Success(updatedTeam);
+      const model = this.mapToTeamResponse(updateTeamDto);
+      return ResultService.Success(model);
     } catch (error) {
       return ResultService.SystemError(error.message, 500);
     }
   }
 
-  async removeTeam(teamCode: string) {
+  async removeTeam(
+    teamCode: string,
+  ): Promise<ResultService<{ success: boolean }>> {
     try {
       const existingTeam = await this.prisma.tBL_TEAM.findUnique({
         where: {
@@ -107,7 +127,11 @@ export class TeamService {
       });
 
       if (!existingTeam) {
-        throw new NotFoundException(`Team with code ${teamCode} not found`);
+        // throw new NotFoundException(`Team with code ${teamCode} not found`);
+        return ResultService.ValidationError(
+          `Team with code ${teamCode} not found`,
+          403,
+        );
       }
 
       await this.prisma.tBL_TEAM.update({
@@ -115,13 +139,16 @@ export class TeamService {
         data: { DEL_FLAG: 1 },
       });
 
-      return ResultService.Success(null);
+      const model = { success: true };
+      return ResultService.Success(model);
     } catch (error) {
       return ResultService.SystemError(error.message, 500);
     }
   }
 
-  async addMemberToTeam(req: AddMemberToTeamDto) {
+  async addMemberToTeam(
+    req: AddMemberToTeamDto,
+  ): Promise<ResultService<{ success: boolean }>> {
     const { memberCode, teamCode, projectCode } = req;
     try {
       // Check if team exists
@@ -133,7 +160,11 @@ export class TeamService {
       });
 
       if (!team) {
-        throw new NotFoundException(`Team with code ${teamCode} not found`);
+        // throw new NotFoundException(`Team with code ${teamCode} not found`);
+        return ResultService.NotFoundError(
+          `Team with code ${teamCode} not found`,
+          404,
+        );
       }
 
       // Check if member exists
@@ -145,7 +176,11 @@ export class TeamService {
       });
 
       if (!member) {
-        throw new NotFoundException(`Member with code ${memberCode} not found`);
+        // throw new NotFoundException(`Member with code ${memberCode} not found`);
+        return ResultService.NotFoundError(
+          `Member with code ${memberCode} not found`,
+          404,
+        );
       }
 
       // Add member to team
@@ -166,8 +201,12 @@ export class TeamService {
         });
 
         if (!project) {
-          throw new NotFoundException(
+          // throw new NotFoundException(
+          //   `Project with code ${projectCode} not found`,
+          // );
+          return ResultService.NotFoundError(
             `Project with code ${projectCode} not found`,
+            404,
           );
         }
 
@@ -188,14 +227,16 @@ export class TeamService {
           });
         }
       }
-
-      return ResultService.Success(null);
+      const model = { success: true };
+      return ResultService.Success(model);
     } catch (error) {
-      return ResultService.SystemError(error.message,  500);
+      return ResultService.SystemError(error.message, 500);
     }
   }
 
-  async addTeamToProject(req: AddTeamToProjectDto) {
+  async addTeamToProject(
+    req: AddTeamToProjectDto,
+  ): Promise<ResultService<{ success: boolean }>> {
     const { teamCode, projectCode } = req;
     try {
       // Check if the project-team relation already exists
@@ -213,7 +254,8 @@ export class TeamService {
           },
         });
       }
-      return ResultService.Success(null);
+      const model = { success: true };
+      return ResultService.Success(model);
     } catch (error) {
       return ResultService.SystemError(error.message, 500);
     }

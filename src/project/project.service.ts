@@ -1,11 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { 
-  CreateProjectDto, 
-  UpdateProjectDto, 
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
   ProjectResponseDto,
-  ProjectStatus
+  ProjectStatus,
 } from './dto/project.dto';
+import { ResultService } from 'src/result/result.service';
 
 @Injectable()
 export class ProjectService {
@@ -22,64 +23,85 @@ export class ProjectService {
       projectDescription: project.PROJECT_DESCRIPTION || undefined,
       projectStatus: project.PROJECT_STATUS || ProjectStatus.PLANNING,
       createdDate: project.CREATED_DATE,
-      updatedDate: project.UPDATED_DATE
+      updatedDate: project.UPDATED_DATE,
     };
   }
 
-  async createProject(createProjectDto: CreateProjectDto): Promise<ProjectResponseDto> {
+  async createProject(
+    createProjectDto: CreateProjectDto,
+  ): Promise<ResultService<ProjectResponseDto>> {
     const project = await this.prisma.tBL_PROJECT.create({
       data: {
         PROJECT_CODE: crypto.randomUUID(),
         PROJECT_NAME: createProjectDto.projectName,
         REPO_URL: createProjectDto.repoUrl,
-        START_DATE: createProjectDto.startDate ? new Date(createProjectDto.startDate) : null,
-        END_DATE: createProjectDto.endDate ? new Date(createProjectDto.endDate) : null,
+        START_DATE: createProjectDto.startDate
+          ? new Date(createProjectDto.startDate)
+          : null,
+        END_DATE: createProjectDto.endDate
+          ? new Date(createProjectDto.endDate)
+          : null,
         PROJECT_DESCRIPTION: createProjectDto.projectDescription,
-        PROJECT_STATUS: createProjectDto.projectStatus
+        PROJECT_STATUS: createProjectDto.projectStatus,
       },
     });
-
-    return this.mapToProjectResponse(project);
+    const model = this.mapToProjectResponse(project);
+    return ResultService.Success(model);
   }
 
-  async findAllProjects(): Promise<ProjectResponseDto[]> {
+  async findAllProjects(): Promise<ResultService<ProjectResponseDto[]>> {
     const projects = await this.prisma.tBL_PROJECT.findMany({
       where: {
-        DEL_FLAG: 0
+        DEL_FLAG: 0,
       },
       orderBy: {
-        CREATED_DATE: 'desc'
-      }
+        CREATED_DATE: 'desc',
+      },
     });
-    
-    return projects.map(project => this.mapToProjectResponse(project));
+
+    const model = projects.map((project) => this.mapToProjectResponse(project));
+    return ResultService.Success(model);
   }
 
-  async findProjectByCode(projectCode: string): Promise<ProjectResponseDto> {
+  async findProjectByCode(
+    projectCode: string,
+  ): Promise<ResultService<ProjectResponseDto>> {
     const project = await this.prisma.tBL_PROJECT.findUnique({
-      where: { 
+      where: {
         PROJECT_CODE: projectCode,
-        DEL_FLAG: 0 
-      }
+        DEL_FLAG: 0,
+      },
     });
 
     if (!project) {
-      throw new NotFoundException(`Project with code ${projectCode} not found`);
+      // throw new NotFoundException(`Project with code ${projectCode} not found`);
+      return ResultService.NotFoundError(
+        `Project with code ${projectCode} not found`,
+        404,
+      );
     }
 
-    return this.mapToProjectResponse(project);
+    const model = this.mapToProjectResponse(project);
+    return ResultService.Success(model);
   }
 
-  async updateProject(projectCode: string, updateProjectDto: UpdateProjectDto): Promise<ProjectResponseDto> {
+  async updateProject(
+    projectCode: string,
+    updateProjectDto: UpdateProjectDto,
+  ): Promise<ResultService<ProjectResponseDto>> {
     const existingProject = await this.prisma.tBL_PROJECT.findUnique({
-      where: { 
+      where: {
         PROJECT_CODE: projectCode,
-        DEL_FLAG: 0 
-      }
+        DEL_FLAG: 0,
+      },
     });
 
     if (!existingProject) {
-      throw new NotFoundException(`Project with code ${projectCode} not found`);
+      // throw new NotFoundException(`Project with code ${projectCode} not found`);
+      return ResultService.NotFoundError(
+        `Project with code ${projectCode} not found`,
+        404,
+      );
     }
 
     const updatedProject = await this.prisma.tBL_PROJECT.update({
@@ -87,34 +109,43 @@ export class ProjectService {
       data: {
         PROJECT_NAME: updateProjectDto.projectName,
         REPO_URL: updateProjectDto.repoUrl,
-        START_DATE: updateProjectDto.startDate ? new Date(updateProjectDto.startDate) : null,
-        END_DATE: updateProjectDto.endDate ? new Date(updateProjectDto.endDate) : null,
+        START_DATE: updateProjectDto.startDate
+          ? new Date(updateProjectDto.startDate)
+          : null,
+        END_DATE: updateProjectDto.endDate
+          ? new Date(updateProjectDto.endDate)
+          : null,
         PROJECT_DESCRIPTION: updateProjectDto.projectDescription,
-        PROJECT_STATUS: updateProjectDto.projectStatus
+        PROJECT_STATUS: updateProjectDto.projectStatus,
+      },
+    });
+    const model = this.mapToProjectResponse(updatedProject);
+    return ResultService.Success(model);
+  }
+
+  async removeProject(
+    projectCode: string,
+  ): Promise<ResultService<{ success: boolean }>> {
+    const existingProject = await this.prisma.tBL_PROJECT.findUnique({
+      where: {
+        PROJECT_CODE: projectCode,
+        DEL_FLAG: 0,
       },
     });
 
-    return this.mapToProjectResponse(updatedProject);
-  }
-
-  async removeProject(projectCode: string): Promise<{ success: boolean }> {
-    const existingProject = await this.prisma.tBL_PROJECT.findUnique({
-      where: { 
-        PROJECT_CODE: projectCode,
-        DEL_FLAG: 0 
-      }
-    });
-
     if (!existingProject) {
-      throw new NotFoundException(`Project with code ${projectCode} not found`);
+      // throw new NotFoundException(`Project with code ${projectCode} not found`);
+      return ResultService.NotFoundError(
+        `Project with code ${projectCode} not found`,
+        404,
+      );
     }
-
 
     await this.prisma.tBL_PROJECT.update({
       where: { PROJECT_CODE: projectCode },
       data: { DEL_FLAG: 1 },
     });
-
-    return { success: true };
+    const model = { success: true };
+    return ResultService.Success(model);
   }
 }
