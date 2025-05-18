@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { 
-  AddMemberToTeamDto, 
-  AddTeamToProjectDto, 
-  CreateTeamDto, 
-  UpdateTeamDto, 
-  TeamResponseDto 
+import {
+  AddMemberToTeamDto,
+  AddTeamToProjectDto,
+  CreateTeamDto,
+  UpdateTeamDto,
+  TeamResponseDto,
 } from './dto/team.dto';
 import { ResultService } from 'src/result/result.service';
 
 @Injectable()
 export class TeamService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   private mapToTeamResponse(team: any): TeamResponseDto {
     return {
@@ -19,90 +19,106 @@ export class TeamService {
       teamCode: team.TEAM_CODE,
       teamName: team.TEAM_NAME,
       createdDate: team.CREATED_DATE,
-      updatedDate: team.UPDATED_DATE
+      updatedDate: team.UPDATED_DATE,
     };
   }
 
-  async createTeam(createTeamDto: CreateTeamDto): Promise<TeamResponseDto> {
-    const team = await this.prisma.tBL_TEAM.create({
-      data: {
-        TEAM_CODE: crypto.randomUUID(),
-        TEAM_NAME: createTeamDto.teamName,
-      },
-    });
-    return this.mapToTeamResponse(team);
+  async createTeam(createTeamDto: CreateTeamDto) {
+    try {
+      const team = await this.prisma.tBL_TEAM.create({
+        data: {
+          TEAM_CODE: crypto.randomUUID(),
+          TEAM_NAME: createTeamDto.teamName,
+        },
+      });
+      // return this.mapToTeamResponse(team);
+      return ResultService.Success(team);
+    } catch (error) {
+      return ResultService.SystemError(error.message, null, 500);
+    }
   }
 
   async findAllTeams() {
     const teams = await this.prisma.tBL_TEAM.findMany({
       where: {
-        DEL_FLAG: 0
+        DEL_FLAG: 0,
       },
       orderBy: {
-        CREATED_DATE: 'desc'
-      }
-    });
-    // return teams.map(team => this.mapToTeamResponse(team));
-    return ResultService.Success(teams)
-  }
-
-  async findTeamByCode(teamCode: string): Promise<TeamResponseDto> {
-    const team = await this.prisma.tBL_TEAM.findUnique({
-      where: { 
-        TEAM_CODE: teamCode,
-        DEL_FLAG: 0 
-      }
-    });
-
-    if (!team) {
-      throw new NotFoundException(`Team with code ${teamCode} not found`);
-    }
-
-    return this.mapToTeamResponse(team);
-  }
-
-  async updateTeam(teamCode: string, updateTeamDto: UpdateTeamDto): Promise<TeamResponseDto> {
-    const existingTeam = await this.prisma.tBL_TEAM.findUnique({
-      where: { 
-        TEAM_CODE: teamCode,
-        DEL_FLAG: 0 
-      }
-    });
-
-    if (!existingTeam) {
-      throw new NotFoundException(`Team with code ${teamCode} not found`);
-    }
-
-    const updatedTeam = await this.prisma.tBL_TEAM.update({
-      where: { TEAM_CODE: teamCode },
-      data: {
-        TEAM_NAME: updateTeamDto.teamName,
+        CREATED_DATE: 'desc',
       },
     });
-
-    return this.mapToTeamResponse(updatedTeam);
+    // return teams.map(team => this.mapToTeamResponse(team));
+    return ResultService.Success(teams);
   }
 
+  async findTeamByCode(teamCode: string) {
+    try {
+      const team = await this.prisma.tBL_TEAM.findUnique({
+        where: {
+          TEAM_CODE: teamCode,
+          DEL_FLAG: 0,
+        },
+      });
 
-  async removeTeam(teamCode: string): Promise<{ success: boolean }> {
-    const existingTeam = await this.prisma.tBL_TEAM.findUnique({
-      where: { 
-        TEAM_CODE: teamCode,
-        DEL_FLAG: 0 
+      if (!team) {
+        throw new NotFoundException(`Team with code ${teamCode} not found`);
       }
-    });
 
-    if (!existingTeam) {
-      throw new NotFoundException(`Team with code ${teamCode} not found`);
+      return ResultService.Success(team);
+    } catch (error) {
+      return ResultService.SystemError(error.message, null, 500);
     }
+  }
 
+  async updateTeam(teamCode: string, updateTeamDto: UpdateTeamDto) {
+    try {
+      const existingTeam = await this.prisma.tBL_TEAM.findUnique({
+        where: {
+          TEAM_CODE: teamCode,
+          DEL_FLAG: 0,
+        },
+      });
 
-    await this.prisma.tBL_TEAM.update({
-      where: { TEAM_CODE: teamCode },
-      data: { DEL_FLAG: 1 },
-    });
+      if (!existingTeam) {
+        throw new NotFoundException(`Team with code ${teamCode} not found`);
+      }
 
-    return { success: true };
+      const updatedTeam = await this.prisma.tBL_TEAM.update({
+        where: { TEAM_CODE: teamCode },
+        data: {
+          TEAM_NAME: updateTeamDto.teamName,
+        },
+      });
+
+      // return this.mapToTeamResponse(updatedTeam);
+      return ResultService.Success(updatedTeam);
+    } catch (error) {
+      return ResultService.SystemError(error.message, null, 500);
+    }
+  }
+
+  async removeTeam(teamCode: string) {
+    try {
+      const existingTeam = await this.prisma.tBL_TEAM.findUnique({
+        where: {
+          TEAM_CODE: teamCode,
+          DEL_FLAG: 0,
+        },
+      });
+
+      if (!existingTeam) {
+        throw new NotFoundException(`Team with code ${teamCode} not found`);
+      }
+
+      await this.prisma.tBL_TEAM.update({
+        where: { TEAM_CODE: teamCode },
+        data: { DEL_FLAG: 1 },
+      });
+
+      return ResultService.Success(null);
+    } catch (error) {
+      return ResultService.SystemError(error.message, null, 500);
+    }
   }
 
   async addMemberToTeam(req: AddMemberToTeamDto) {
@@ -110,10 +126,10 @@ export class TeamService {
     try {
       // Check if team exists
       const team = await this.prisma.tBL_TEAM.findUnique({
-        where: { 
+        where: {
           TEAM_CODE: teamCode,
-          DEL_FLAG: 0 
-        }
+          DEL_FLAG: 0,
+        },
       });
 
       if (!team) {
@@ -122,10 +138,10 @@ export class TeamService {
 
       // Check if member exists
       const member = await this.prisma.tBL_MEMBER.findUnique({
-        where: { 
+        where: {
           MEMBER_CODE: memberCode,
-          DEL_FLAG: 0 
-        }
+          DEL_FLAG: 0,
+        },
       });
 
       if (!member) {
@@ -143,22 +159,23 @@ export class TeamService {
       // Ensure project-team relationship exists if projectCode is provided
       if (projectCode) {
         const project = await this.prisma.tBL_PROJECT.findUnique({
-          where: { 
+          where: {
             PROJECT_CODE: projectCode,
-            DEL_FLAG: 0 
-          }
+            DEL_FLAG: 0,
+          },
         });
 
         if (!project) {
-          throw new NotFoundException(`Project with code ${projectCode} not found`);
+          throw new NotFoundException(
+            `Project with code ${projectCode} not found`,
+          );
         }
-
 
         const projectTeam = await this.prisma.tBL_PROJECTTEAM.findFirst({
           where: {
             PROJECT_CODE: projectCode,
             TEAM_CODE: teamCode,
-            DEL_FLAG: 0
+            DEL_FLAG: 0,
           },
         });
 
@@ -172,9 +189,9 @@ export class TeamService {
         }
       }
 
-      return { success: true };
+      return ResultService.Success(null);
     } catch (error) {
-      throw new Error(`Failed to add member to team: ${error.message}`);
+      return ResultService.SystemError(error.message, null, 500);
     }
   }
 
@@ -196,9 +213,9 @@ export class TeamService {
           },
         });
       }
-      return { success: true };
+      return ResultService.Success(null);
     } catch (error) {
-      throw new Error(`Failed to add team to project: ${error.message}`);
+      return ResultService.SystemError(error.message, null, 500);
     }
   }
 }
