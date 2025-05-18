@@ -40,8 +40,10 @@ export class RegisterMemberDto {
 
 export class createMemberTechStackDto {
   @IsNotEmpty()
+  memberCode: string;
+
+  @IsNotEmpty()
   techStacks: Array<{
-    memberCode: string;
     techStackCode: string;
     proficiencyLevel: number;
   }>;
