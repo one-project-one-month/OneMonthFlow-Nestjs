@@ -53,42 +53,40 @@ export class ResultService<T> {
 
   public static ValidationError<T>(
     message: string,
-    data: T | null = null,
+
     statusCode: number,
   ): ResultService<T> {
     return new ResultService<T>(
       false,
       message,
       EnumRespType.ValidationError,
-      data,
+      null,
       statusCode,
     );
   }
 
   public static SystemError<T>(
     message: string,
-    data: T | null = null,
     statusCode: number,
   ): ResultService<T> {
     return new ResultService<T>(
       false,
       message,
       EnumRespType.SystemError,
-      data,
+      null,
       statusCode,
     );
   }
 
   public static NotFoundError<T>(
     message: string,
-    data: T | null = null,
     statusCode: number,
   ): ResultService<T> {
     return new ResultService<T>(
       false,
       message,
       EnumRespType.NotFoundError,
-      data,
+      null,
       statusCode,
     );
   }

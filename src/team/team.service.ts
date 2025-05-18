@@ -34,7 +34,7 @@ export class TeamService {
       // return this.mapToTeamResponse(team);
       return ResultService.Success(team);
     } catch (error) {
-      return ResultService.SystemError(error.message, null, 500);
+      return ResultService.SystemError(error.message, 500);
     }
   }
 
@@ -66,7 +66,7 @@ export class TeamService {
 
       return ResultService.Success(team);
     } catch (error) {
-      return ResultService.SystemError(error.message, null, 500);
+      return ResultService.SystemError(error.message,  500);
     }
   }
 
@@ -93,7 +93,7 @@ export class TeamService {
       // return this.mapToTeamResponse(updatedTeam);
       return ResultService.Success(updatedTeam);
     } catch (error) {
-      return ResultService.SystemError(error.message, null, 500);
+      return ResultService.SystemError(error.message, 500);
     }
   }
 
@@ -117,7 +117,7 @@ export class TeamService {
 
       return ResultService.Success(null);
     } catch (error) {
-      return ResultService.SystemError(error.message, null, 500);
+      return ResultService.SystemError(error.message, 500);
     }
   }
 
@@ -191,7 +191,7 @@ export class TeamService {
 
       return ResultService.Success(null);
     } catch (error) {
-      return ResultService.SystemError(error.message, null, 500);
+      return ResultService.SystemError(error.message,  500);
     }
   }
 
@@ -215,7 +215,7 @@ export class TeamService {
       }
       return ResultService.Success(null);
     } catch (error) {
-      return ResultService.SystemError(error.message, null, 500);
+      return ResultService.SystemError(error.message, 500);
     }
   }
 }
