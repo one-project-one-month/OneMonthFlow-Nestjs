@@ -12,9 +12,9 @@ model TBL_MEMBER {
   MEMBER_ID            Int      @id @default(autoincrement())
   MEMBER_CODE          String   @unique @default(uuid())
   MEMBER_NAME          String
-  GITHUB_ACCOUNT_NAME  String?
-  NRC                  String?
-  MOBILE_NO            String?
+  GITHUB_ACCOUNT_NAME  String?  @unique
+  NRC                  String?  @unique
+  MOBILE_NO            String?  @unique
   CREATED_DATE         DateTime @default(now())
   CREATED_BY           String?
   UPDATED_DATE         DateTime @default(now()) @updatedAt

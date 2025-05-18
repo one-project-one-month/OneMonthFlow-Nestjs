@@ -1,4 +1,12 @@
-import { IsString, IsInt, IsNotEmpty, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsNotEmpty,
+  IsUUID,
+  IsDecimal,
+  IsOptional,
+  isNotEmpty,
+} from 'class-validator';
 
 export class RegisterMemberDto {
   @IsString()
@@ -16,9 +24,36 @@ export class RegisterMemberDto {
   @IsNotEmpty()
   mobileNo: string;
 
-  @IsUUID()
-  teamCode: string;
+  team?: Array<{
+    teamCode: string;
+  }>;
 
-  @IsUUID()
+  @IsString()
+  @IsOptional()
   projectCode: string;
+
+  techStacks?: Array<{
+    techStackCode: string;
+    proficiencyLevel: number;
+  }>;
+}
+
+export class createMemberTechStackDto {
+  @IsNotEmpty()
+  techStacks: Array<{
+    memberCode: string;
+    techStackCode: string;
+    proficiencyLevel: number;
+  }>;
+}
+
+export class updateMemberTechStackDto {
+  @IsNotEmpty()
+  memberCode: string;
+
+  @IsNotEmpty()
+  techStacks: Array<{
+    techStackCode: string;
+    proficiencyLevel: number;
+  }>;
 }
