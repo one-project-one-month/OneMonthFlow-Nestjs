@@ -24,9 +24,10 @@ export class RegisterMemberDto {
   @IsNotEmpty()
   mobileNo: string;
 
-  team?: Array<{
-    teamCode: string;
-  }>;
+  @IsString()
+  @IsOptional()
+  teamCode: string;
+
 
   @IsString()
   @IsOptional()
