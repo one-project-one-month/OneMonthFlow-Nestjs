@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateTechStackDto,
@@ -35,8 +35,12 @@ export class TechstackService {
       });
 
       if (existingTechStack) {
-        throw new Error(
+        // throw new Error(
+        //   `Tech stack with name '${createTechStackDto.techStackName}' already exists`,
+        // );
+        return ResultService.ValidationError(
           `Tech stack with name '${createTechStackDto.techStackName}' already exists`,
+          403,
         );
       }
 
@@ -83,8 +87,12 @@ export class TechstackService {
       });
 
       if (!techstack) {
-        throw new NotFoundException(
+        // throw new NotFoundException(
+        //   `Tech stack with code ${techStackCode} not found`,
+        // );
+        return ResultService.NotFoundError(
           `Tech stack with code ${techStackCode} not found`,
+          404,
         );
       }
 

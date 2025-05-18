@@ -11,6 +11,18 @@ import { ResultService } from 'src/result/result.service';
 export class MemberService {
   constructor(private prisma: PrismaService) {}
 
+  private mapToMemberResponse(member: any): RegisterMemberDto {
+    return {
+      memberName: member.MEMBER_NAME,
+      githubAccountName: member.GITHUB_ACCOUNT_NAME,
+      mobileNo: member.MOBILE_NO,
+      nrc: member.NRC,
+      projectCode: member.PROJECT_CODE,
+      team: member.TEAM,
+      techStacks: member.TECHSTACK,
+    };
+  }
+
   async registerMember(req: RegisterMemberDto) {
     const {
       memberName,
@@ -24,8 +36,12 @@ export class MemberService {
 
     // Validate required fields
     if (!memberName || !githubAccountName || !mobileNo) {
-      throw new BadRequestException(
+      // throw new BadRequestException(
+      //   'Member name, GitHub account name, and mobile number are required',
+      // );
+      return ResultService.NotFoundError(
         'Member name, GitHub account name, and mobile number are required',
+        404,
       );
     }
 
