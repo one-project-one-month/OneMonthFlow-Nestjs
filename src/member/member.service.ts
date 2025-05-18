@@ -90,7 +90,7 @@ export class MemberService {
   }
 
   async createMemberTechStack(req: createMemberTechStackDto) {
-    const { techStacks } = req;
+    const {memberCode, techStacks } = req;
 
     if (!techStacks || techStacks.length === 0) {
       throw new BadRequestException('TechStacks array is required and must not be empty');
@@ -98,11 +98,12 @@ export class MemberService {
 
     try {
       // Create all member-techstack relationships in a single transaction
+
       const createdTechStacks = await this.prisma.$transaction(
         techStacks.map(item =>
           this.prisma.tBL_MEMBERTECHSTACK.create({
             data: {
-              MEMBER_CODE: item.memberCode,
+              MEMBER_CODE: memberCode,
               TECHSTACK_CODE: item.techStackCode,
               PROFICIENCY_LEVEL: item.proficiencyLevel,
             },
