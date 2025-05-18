@@ -17,13 +17,13 @@ export class MemberService {
       githubAccountName: member.GITHUB_ACCOUNT_NAME,
       mobileNo: member.MOBILE_NO,
       nrc: member.NRC,
-      projectCode: member.PROJECT_CODE,
-      team: member.TEAM,
       techStacks: member.TECHSTACK,
     };
   }
 
-  async registerMember(req: RegisterMemberDto) {
+  async registerMember(
+    req: RegisterMemberDto,
+  ): Promise<ResultService<RegisterMemberDto>> {
     const {
       memberName,
       githubAccountName,
@@ -59,15 +59,17 @@ export class MemberService {
 
       // 2. Link member to techstacks if provided
       if (techStacks && techStacks.length > 0) {
-        for await (const item of techStacks) {
-          await this.prisma.tBL_MEMBERTECHSTACK.create({
-            data: {
-              MEMBER_CODE: member.MEMBER_CODE,
-              TECHSTACK_CODE: item.techStackCode,
-              PROFICIENCY_LEVEL: item.proficiencyLevel,
-            },
-          });
-        }
+        await this.prisma.$transaction(
+          techStacks.map((item) =>
+            this.prisma.tBL_MEMBERTECHSTACK.create({
+              data: {
+                MEMBER_CODE: member.MEMBER_CODE,
+                TECHSTACK_CODE: item.techStackCode,
+                PROFICIENCY_LEVEL: item.proficiencyLevel,
+              },
+            }),
+          ),
+        );
       }
 
       // 3. Link member to team if team is provided
@@ -82,7 +84,7 @@ export class MemberService {
       }
 
       // 4 Create project-team relationship if projectCode is provided
-      if (projectCode) {
+      if (teamCode && projectCode) {
         const projectTeam = await this.prisma.tBL_PROJECTTEAM.findFirst({
           where: {
             PROJECT_CODE: projectCode,
@@ -100,19 +102,33 @@ export class MemberService {
         }
       }
 
+      const model = this.mapToMemberResponse(member);
       // return { success: true, member };
-      return ResultService.Success(member);
+      return ResultService.Success(model);
     } catch (error) {
       throw new Error(`Failed to register member: ${error.message}`);
     }
   }
 
-  async createMemberTechStack(req: createMemberTechStackDto) {
+  private mapToMemberTechStackResponse(member: any): createMemberTechStackDto {
+    return {
+      memberCode: member.MEMBER_CODE,
+      techStacks: member.TECHSTACK,
+    };
+  }
+
+  async createMemberTechStack(
+    req: createMemberTechStackDto,
+  ): Promise<ResultService<createMemberTechStackDto>> {
     const { memberCode, techStacks } = req;
 
     if (!techStacks || techStacks.length === 0) {
-      throw new BadRequestException(
+      // throw new BadRequestException(
+      //   'TechStacks array is required and must not be empty',
+      // );
+      return ResultService.NotFoundError(
         'TechStacks array is required and must not be empty',
+        404,
       );
     }
 
@@ -132,20 +148,31 @@ export class MemberService {
       );
 
       // return { success: true, createdTechStacks };
-      return ResultService.Success(createdTechStacks);
+      const model = this.mapToMemberTechStackResponse(createdTechStacks);
+      return ResultService.Success(model);
     } catch (error) {
-      throw new BadRequestException(
+      // throw new BadRequestException(
+      //   `Failed to create member techstack: ${error.message}`,
+      // );
+      return ResultService.SystemError(
         `Failed to create member techstack: ${error.message}`,
+        500,
       );
     }
   }
 
-  async updateMemberTechStack(req: updateMemberTechStackDto) {
+  async updateMemberTechStack(
+    req: updateMemberTechStackDto,
+  ): Promise<ResultService<updateMemberTechStackDto>> {
     const { memberCode, techStacks } = req;
 
     if (!techStacks || techStacks.length === 0) {
-      throw new BadRequestException(
+      // throw new BadRequestException(
+      //   'TechStacks array is required and must not be empty',
+      // );
+      return ResultService.NotFoundError(
         'TechStacks array is required and must not be empty',
+        404,
       );
     }
 
@@ -170,11 +197,16 @@ export class MemberService {
         ),
       );
 
+      const model = this.mapToMemberTechStackResponse(updatedTechStacks);
       // return { success: true, updatedTechStacks };
-      return ResultService.Success(updatedTechStacks);
+      return ResultService.Success(model);
     } catch (error) {
-      throw new BadRequestException(
+      // throw new BadRequestException(
+      //   `Failed to update member techstack: ${error.message}`,
+      // );
+      return ResultService.SystemError(
         `Failed to update member techstack: ${error.message}`,
+        500,
       );
     }
   }

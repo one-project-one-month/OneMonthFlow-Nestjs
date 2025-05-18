@@ -26,12 +26,12 @@ export class RegisterMemberDto {
 
   @IsString()
   @IsOptional()
-  teamCode: string;
+  teamCode?: string;
 
 
   @IsString()
   @IsOptional()
-  projectCode: string;
+  projectCode?: string;
 
   techStacks?: Array<{
     techStackCode: string;
