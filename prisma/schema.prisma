@@ -10,7 +10,7 @@ generator client {
 
 model TBL_MEMBER {
   MEMBER_ID            Int      @id @default(autoincrement())
-  MEMBER_CODE          String   @unique @default(uuid())
+  MEMBER_CODE          String   @unique @default(dbgenerated("(UUID())"))
   MEMBER_NAME          String
   GITHUB_ACCOUNT_NAME  String?
   NRC                  String?
@@ -23,7 +23,7 @@ model TBL_MEMBER {
 
 model TBL_TECHSTACK {
   TECHSTACK_ID         Int      @id @default(autoincrement())
-  TECHSTACK_CODE       String   @unique @default(uuid())
+  TECHSTACK_CODE       String   @unique @default(dbgenerated("(UUID())"))
   TECHSTACK_SHORT_CODE String?
   TECHSTACK_NAME       String
   CREATED_DATE         DateTime @default(now())
@@ -45,7 +45,7 @@ model TBL_MEMBERTECHSTACK {
 
 model TBL_TEAM {
   TEAM_ID              Int      @id @default(autoincrement())
-  TEAM_CODE            String   @unique @default(uuid())
+  TEAM_CODE            String   @unique @default(dbgenerated("(UUID())"))
   TEAM_NAME            String
   CREATED_DATE         DateTime @default(now())
   CREATED_BY           String?
@@ -55,7 +55,7 @@ model TBL_TEAM {
 
 model TBL_PROJECT {
   PROJECT_ID           Int      @id @default(autoincrement())
-  PROJECT_CODE         String   @unique @default(uuid())
+  PROJECT_CODE         String   @unique @default(dbgenerated("(UUID())"))
   PROJECT_NAME         String
   REPO_URL             String?
   START_DATE           DateTime?
