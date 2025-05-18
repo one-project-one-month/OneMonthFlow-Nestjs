@@ -46,7 +46,7 @@ model TBL_MEMBERTECHSTACK {
 model TBL_TEAM {
   TEAM_ID              Int      @id @default(autoincrement())
   TEAM_CODE            String   @unique @default(dbgenerated("(UUID())"))
-  TEAM_NAME            String
+  TEAM_NAME            String   @unique
   CREATED_DATE         DateTime @default(now())
   CREATED_BY           String?
   UPDATED_DATE         DateTime @default(now()) @updatedAt

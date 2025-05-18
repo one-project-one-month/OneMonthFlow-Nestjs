@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Put } from '@nestjs/common';
 import { createMemberTechStackDto, RegisterMemberDto, updateMemberTechStackDto } from './dto';
 import { MemberService } from './member.service';
-import { UpdateTechStackDto } from 'src/techstack/dto/techstack.dto';
+import { ResultService } from 'src/result/result.service';
 
 @Controller('member')
 export class MemberController {
@@ -12,7 +12,8 @@ export class MemberController {
       const result = await this.memberService.registerMember(registerMemberDto);
       return result;
     } catch (error) {
-      return { success: false, message: error.message };
+      // return { success: false, message: error.message };
+      return ResultService.SystemError(error.message,null,500)
     }
   }
 

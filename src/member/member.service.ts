@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createMemberTechStackDto, RegisterMemberDto, updateMemberTechStackDto } from './dto';
+import { ResultService } from 'src/result/result.service';
 
 @Injectable()
 export class MemberService {
@@ -83,7 +84,8 @@ export class MemberService {
         }
       }
 
-      return { success: true, member };
+      // return { success: true, member };
+      return ResultService.Success(member)
     } catch (error) {
       throw new Error(`Failed to register member: ${error.message}`);
     }
@@ -111,7 +113,8 @@ export class MemberService {
         ),
       );
 
-      return { success: true, createdTechStacks };
+      // return { success: true, createdTechStacks };
+      return ResultService.Success(createdTechStacks)
     } catch (error) {
       throw new BadRequestException(`Failed to create member techstack: ${error.message}`);
     }
@@ -145,7 +148,8 @@ export class MemberService {
         ),
       );
 
-      return { success: true, updatedTechStacks };
+      // return { success: true, updatedTechStacks };
+      return ResultService.Success(updatedTechStacks)
     } catch (error) {
       throw new BadRequestException(`Failed to update member techstack: ${error.message}`);
     }

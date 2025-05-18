@@ -7,6 +7,7 @@ import {
   UpdateTeamDto, 
   TeamResponseDto 
 } from './dto/team.dto';
+import { ResultService } from 'src/result/result.service';
 
 @Injectable()
 export class TeamService {
@@ -32,7 +33,7 @@ export class TeamService {
     return this.mapToTeamResponse(team);
   }
 
-  async findAllTeams(): Promise<TeamResponseDto[]> {
+  async findAllTeams() {
     const teams = await this.prisma.tBL_TEAM.findMany({
       where: {
         DEL_FLAG: 0
@@ -41,7 +42,8 @@ export class TeamService {
         CREATED_DATE: 'desc'
       }
     });
-    return teams.map(team => this.mapToTeamResponse(team));
+    // return teams.map(team => this.mapToTeamResponse(team));
+    return ResultService.Success(teams)
   }
 
   async findTeamByCode(teamCode: string): Promise<TeamResponseDto> {

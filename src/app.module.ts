@@ -13,6 +13,7 @@ import { ProjectService } from './project/project.service';
 import { TechstackController } from './techstack/techstack.controller';
 import { TechstackService } from './techstack/techstack.service';
 import { TeamactivityModule } from './teamactivity/teamactivity.module';
+import { ResultModule } from './result/result.module';
 
 @Module({
   imports: [
@@ -22,7 +23,9 @@ import { TeamactivityModule } from './teamactivity/teamactivity.module';
     }),
     MemberModule,
     PrismaModule,
-    TeamactivityModule  ],
+    TeamactivityModule,
+    ResultModule
+  ],
   controllers: [AppController, MemberController, TeamController, ProjectController,TechstackController
   ],
   providers: [AppService, MemberService,TeamService,ProjectService,TechstackService],

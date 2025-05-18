@@ -27,7 +27,7 @@ export class TeamController {
   }
 
   @Get()
-  async findAll(): Promise<TeamResponseDto[]> {
+  async findAll() {
     return this.teamService.findAllTeams();
   }
 
